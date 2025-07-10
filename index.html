@@ -11,20 +11,17 @@
       --text-color: #6a0dad;
       --score-bg: rgba(255, 255, 255, 0.9);
     }
-
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
     }
-
     body {
       margin: 0;
       overflow: hidden;
       font-family: 'Chewy', cursive;
       background-color: #fce4ec;
     }
-
     .game {
       position: relative;
       width: 100vw;
@@ -35,7 +32,6 @@
       overflow: hidden;
       user-select: none;
     }
-
     .rainel {
       position: absolute;
       width: 50px;
@@ -50,18 +46,15 @@
       background: white;
       animation: float 2s ease-in-out infinite;
     }
-
     @keyframes float {
       0%, 100% { transform: translateY(-2px); }
       50% { transform: translateY(2px); }
     }
-
     .rainel img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-
     .pipe, .pipe-top {
       position: absolute;
       width: 80px;
@@ -70,14 +63,11 @@
       opacity: 0;
       animation: fadeIn 0.5s ease forwards;
     }
-
     @keyframes fadeIn {
       to { opacity: 1; }
     }
-
     .pipe { bottom: 0; }
     .pipe-top { top: 0; }
-
     #score {
       position: absolute;
       top: 20px;
@@ -91,7 +81,6 @@
       color: var(--text-color);
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
-
     #high-score {
       position: absolute;
       top: 60px;
@@ -103,14 +92,12 @@
       z-index: 20;
       color: #d63384;
     }
-
     #controls {
       position: absolute;
       top: 20px;
       left: 20px;
       z-index: 30;
     }
-
     #controls select {
       font-family: 'Chewy', cursive;
       background: white;
@@ -121,7 +108,6 @@
       cursor: pointer;
       color: #d63384;
     }
-
     #game-over {
       position: absolute;
       top: 40%;
@@ -137,7 +123,6 @@
       z-index: 100;
       box-shadow: 0 0 20px rgba(0,0,0,0.3);
     }
-
     #restart {
       margin-top: 20px;
       padding: 10px 24px;
@@ -147,16 +132,13 @@
       border-radius: 20px;
       cursor: pointer;
     }
-
     .flash {
       animation: flashEffect 0.4s;
     }
-
     @keyframes flashEffect {
       0% { background: rgba(255,255,255,0.8); }
       100% { background: transparent; }
     }
-
     #start-overlay {
       position: absolute;
       width: 100%;
@@ -198,8 +180,6 @@
       <div>Game Over!</div>
       <button id="restart">Restart</button>
     </div>
-
-    <!-- Sounds -->
     <audio id="flap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7b96e3677.mp3"></audio>
     <audio id="crash-sound" src="https://cdn.pixabay.com/download/audio/2023/03/29/audio_e429ea7b88.mp3"></audio>
     <audio id="water-drop" src="https://cdn.pixabay.com/download/audio/2022/03/07/audio_d6c4c02fb0.mp3"></audio>
@@ -231,10 +211,10 @@
     let pipeSpeed = 1.5;
     let gapSize = 280;
     let pipeSpawnerId = null;
-    let pipeInterval = 2300;
+    const pipeInterval = 2300;
     let currentPipeColor = 'linear-gradient(to bottom, #e0aaff, #c77dff)';
-
     let highScore = parseInt(localStorage.getItem("rainelPrincessHigh") || "0");
+
     highScoreDisplay.textContent = "High Score: " + highScore;
 
     function changeTheme(theme) {
@@ -275,13 +255,6 @@
       waterDrop.play();
     }
 
-    function updateDifficulty(score) {
-      if (score % 10 === 0 && score !== 0) {
-        pipeSpeed += 0.3;
-        gapSize = Math.max(120, gapSize - 10);
-      }
-    }
-
     function createPipe() {
       const minGapY = 100;
       const maxGapY = window.innerHeight - gapSize - 100;
@@ -315,13 +288,8 @@
         const topRect = pipeTop.getBoundingClientRect();
         const bottomRect = pipeBottom.getBoundingClientRect();
 
-        const hitTop = rainelRect.left < topRect.right &&
-                       rainelRect.right > topRect.left &&
-                       rainelRect.top < topRect.bottom;
-
-        const hitBottom = rainelRect.left < bottomRect.right &&
-                          rainelRect.right > bottomRect.left &&
-                          rainelRect.bottom > bottomRect.top;
+        const hitTop = rainelRect.left < topRect.right && rainelRect.right > topRect.left && rainelRect.top < topRect.bottom;
+        const hitBottom = rainelRect.left < bottomRect.right && rainelRect.right > bottomRect.left && rainelRect.bottom > bottomRect.top;
 
         if (hitTop || hitBottom || rainelY > window.innerHeight - 60 || rainelY < 0) {
           endGame();
@@ -344,10 +312,25 @@
       }, 16);
     }
 
+    function updateDifficulty(score) {
+      if (score % 10 === 0 && score !== 0) {
+        pipeSpeed += 0.3;
+        gapSize = Math.max(120, gapSize - 10);
+      }
+    }
+
     function pipeSpawner() {
       if (!gameRunning) return;
       createPipe();
       pipeSpawnerId = setTimeout(pipeSpawner, pipeInterval);
+    }
+
+    function loop() {
+      if (!gameRunning) return;
+      velocity += gravity;
+      rainelY += velocity;
+      rainel.style.top = rainelY + "px";
+      requestAnimationFrame(loop);
     }
 
     function endGame() {
@@ -364,6 +347,7 @@
     }
 
     function restartGame() {
+      clearTimeout(pipeSpawnerId); // ✅ FIX for overlapping pipes
       document.querySelectorAll(".pipe, .pipe-top").forEach(el => el.remove());
       rainelY = 200;
       velocity = 0;
@@ -377,16 +361,6 @@
       pipeSpawner();
     }
 
-    restartBtn.addEventListener("click", restartGame);
-
-    function loop() {
-      if (!gameRunning) return;
-      velocity += gravity;
-      rainelY += velocity;
-      rainel.style.top = rainelY + "px";
-      requestAnimationFrame(loop);
-    }
-
     function startGame() {
       if (gameStarted) return;
       startOverlay.style.display = "none";
@@ -398,8 +372,11 @@
 
     startOverlay.addEventListener("click", startGame);
     startOverlay.addEventListener("touchstart", startGame);
+    document.addEventListener("keydown", (e) => { if (e.code === "Space") flap(); });
+    document.addEventListener("touchstart", flap);
+    restartBtn.addEventListener("click", restartGame);
 
-    // Unlock audio on first interaction
+    // Unlock audio
     function unlockAudio() {
       [flapSound, crashSound, waterDrop, scoreSound].forEach(audio => {
         audio.play().catch(() => {});
@@ -411,11 +388,6 @@
     document.addEventListener("touchstart", unlockAudio);
     document.addEventListener("click", unlockAudio);
     document.addEventListener("keydown", unlockAudio);
-
-    document.addEventListener("keydown", (e) => {
-      if (e.code === "Space") flap();
-    });
-    document.addEventListener("touchstart", flap);
 
     changeTheme('light');
   </script>
