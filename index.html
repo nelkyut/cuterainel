@@ -4,19 +4,26 @@
   <meta charset="UTF-8" />
   <title>Rainel Flappy Princess</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <link href="https://fonts.googleapis.com/css2?family=Chewy&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg-color: rgba(255, 255, 255, 0.9);
+      --text-color: #6a0dad;
+      --score-bg: rgba(255, 255, 255, 0.9);
+    }
+
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
     }
+
     body {
       margin: 0;
       overflow: hidden;
-      font-family: 'Baloo 2', cursive;
+      font-family: 'Chewy', cursive;
+      background-color: #fce4ec;
     }
-
-    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&display=swap');
 
     .game {
       position: relative;
@@ -69,12 +76,11 @@
       transform: translateX(-50%);
       font-size: 28px;
       font-weight: bold;
-      background: rgba(255,255,255,0.9);
+      background: var(--score-bg);
       padding: 10px 20px;
       border-radius: 25px;
       z-index: 20;
-      color: #6a0dad;
-      font-family: 'Baloo 2', cursive;
+      color: var(--text-color);
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
 
@@ -90,21 +96,24 @@
       color: #d63384;
     }
 
-    #mode-buttons {
+    #controls {
       position: absolute;
       top: 20px;
-      right: 20px;
+      left: 20px;
       z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    #mode-buttons button {
+    #controls select, #controls button {
+      font-family: 'Chewy', cursive;
       background: white;
       border: 2px solid #d63384;
       border-radius: 20px;
-      padding: 8px 14px;
+      padding: 6px 14px;
       font-weight: bold;
       cursor: pointer;
-      margin-left: 5px;
       color: #d63384;
     }
 
@@ -148,7 +157,12 @@
   <div class="game" id="game">
     <div id="score">Score: 0</div>
     <div id="high-score">High Score: 0</div>
-    <div id="mode-buttons">
+    <div id="controls">
+      <select onchange="changeTheme(this.value)">
+        <option value="light">🌸 Light Pink</option>
+        <option value="purple">💜 Pastel Purple</option>
+        <option value="dark">🌙 Night Mode</option>
+      </select>
       <button onclick="setMode('easy')">Easy</button>
       <button onclick="setMode('hard')">Hard</button>
     </div>
@@ -195,6 +209,26 @@
       } else if (mode === 'hard') {
         pipeSpeed = 3;
         gapSize = 180;
+      }
+    }
+
+    function changeTheme(theme) {
+      const root = document.documentElement;
+      if (theme === 'light') {
+        root.style.setProperty('--bg-color', 'rgba(255, 255, 255, 0.9)');
+        root.style.setProperty('--text-color', '#6a0dad');
+        root.style.setProperty('--score-bg', 'rgba(255, 255, 255, 0.9)');
+        document.body.style.backgroundColor = '#fce4ec';
+      } else if (theme === 'purple') {
+        root.style.setProperty('--bg-color', 'rgba(230, 220, 255, 0.9)');
+        root.style.setProperty('--text-color', '#4b0082');
+        root.style.setProperty('--score-bg', 'rgba(240, 230, 255, 0.9)');
+        document.body.style.backgroundColor = '#e6ccff';
+      } else if (theme === 'dark') {
+        root.style.setProperty('--bg-color', 'rgba(20, 20, 30, 0.9)');
+        root.style.setProperty('--text-color', '#ffffff');
+        root.style.setProperty('--score-bg', 'rgba(40, 40, 60, 0.9)');
+        document.body.style.backgroundColor = '#121212';
       }
     }
 
@@ -317,7 +351,8 @@
       setTimeout(pipeSpawner, 1800);
     }
 
-    setMode('easy'); // Default mode
+    setMode('easy');
+    changeTheme('light'); // default
     loop();
     pipeSpawner();
   </script>
