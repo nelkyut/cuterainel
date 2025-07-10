@@ -105,7 +105,7 @@
       gap: 8px;
     }
 
-    #controls select, #controls button {
+    #controls select {
       font-family: 'Chewy', cursive;
       background: white;
       border: 2px solid #d63384;
@@ -163,8 +163,6 @@
         <option value="dark">🌙 Night Mode</option>
         <option value="sky">☁️ Sky Blue</option>
       </select>
-      <button onclick="setMode('easy')">Easy</button>
-      <button onclick="setMode('hard')">Hard</button>
     </div>
     <div class="rainel" id="rainel">
       <img src="rainel.png" alt="Rainel Princess">
@@ -202,16 +200,6 @@
     let pipeSpeed = 1.5;
     let gapSize = 280;
     let currentPipeColor = 'linear-gradient(to bottom, #e0aaff, #c77dff)'; // default
-
-    function setMode(mode) {
-      if (mode === 'easy') {
-        pipeSpeed = 1.5;
-        gapSize = 280;
-      } else if (mode === 'hard') {
-        pipeSpeed = 3;
-        gapSize = 180;
-      }
-    }
 
     function changeTheme(theme) {
       const root = document.documentElement;
@@ -255,6 +243,13 @@
       if (e.code === "Space") flap();
     });
     document.addEventListener("touchstart", flap);
+
+    function updateDifficulty(score) {
+      if (score % 10 === 0 && score !== 0) {
+        pipeSpeed += 0.3;
+        gapSize = Math.max(120, gapSize - 10);
+      }
+    }
 
     function createPipe() {
       const minGapY = 100;
@@ -312,6 +307,7 @@
           scored = true;
           score++;
           scoreDisplay.textContent = "Score: " + score;
+          updateDifficulty(score);
         }
 
         if (pipeX < -100) {
@@ -340,6 +336,8 @@
       rainelY = 200;
       velocity = 0;
       score = 0;
+      pipeSpeed = 1.5;
+      gapSize = 280;
       scoreDisplay.textContent = "Score: 0";
       gameOver.style.display = "none";
       gameRunning = true;
@@ -363,8 +361,7 @@
       setTimeout(pipeSpawner, 1800);
     }
 
-    setMode('easy');
-    changeTheme('light'); // default
+    changeTheme('light');
     loop();
     pipeSpawner();
   </script>
