@@ -189,11 +189,16 @@
       <button id="restart">Restart</button>
     </div>
 
+    <!-- Background Music -->
     <audio autoplay loop>
       <source src="https://cdn.pixabay.com/download/audio/2023/04/03/audio_5b9884cd87.mp3?filename=asian-wet-market-ambience-143190.mp3" type="audio/mpeg">
     </audio>
+
+    <!-- Sound Effects -->
     <audio id="flap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7b96e3677.mp3?filename=wing-flap-6763.mp3"></audio>
     <audio id="crash-sound" src="https://cdn.pixabay.com/download/audio/2023/03/29/audio_e429ea7b88.mp3?filename=impact-soft-142001.mp3"></audio>
+    <audio id="water-drop" src="https://cdn.pixabay.com/download/audio/2022/03/07/audio_d6c4c02fb0.mp3?filename=water-drop-144269.mp3"></audio>
+    <audio id="score-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b130b1d222.mp3?filename=success-1-6297.mp3"></audio>
   </div>
 
   <script>
@@ -206,6 +211,8 @@
 
     const flapSound = document.getElementById("flap-sound");
     const crashSound = document.getElementById("crash-sound");
+    const waterDrop = document.getElementById("water-drop");
+    const scoreSound = document.getElementById("score-sound");
 
     let rainelY = 200;
     let velocity = 0;
@@ -254,6 +261,8 @@
       velocity = jump;
       flapSound.currentTime = 0;
       flapSound.play();
+      waterDrop.currentTime = 0;
+      waterDrop.play();
     }
 
     document.addEventListener("keydown", (e) => {
@@ -324,6 +333,8 @@
           scored = true;
           score++;
           scoreDisplay.textContent = "Score: " + score;
+          scoreSound.currentTime = 0;
+          scoreSound.play();
           updateDifficulty(score);
         }
 
@@ -345,7 +356,6 @@
         localStorage.setItem("rainelPrincessHigh", highScore.toString());
       }
       highScoreDisplay.textContent = "High Score: " + highScore;
-
       gameOver.style.display = "block";
     }
 
