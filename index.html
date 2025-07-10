@@ -3,8 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <title>Rainel Flappy Princess (Easy)</title>
+
+  <!-- Disable zooming on mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
     body {
       margin: 0;
       overflow: hidden;
@@ -19,6 +27,9 @@
       background-size: cover;
       background-position: center;
       overflow: hidden;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
 
     .rainel {
@@ -179,18 +190,22 @@
     document.addEventListener("touchstart", flap);
 
     function createPipe() {
-      const pipeHeight = Math.floor(Math.random() * 200) + 100;
+      const centerY = window.innerHeight / 2;
+      const pipeTopHeight = centerY - gapSize / 2;
+      const pipeBottomTop = centerY + gapSize / 2;
+
       const pipeTop = document.createElement("div");
       const pipeBottom = document.createElement("div");
 
       pipeTop.classList.add("pipe-top");
       pipeBottom.classList.add("pipe");
 
-      pipeTop.style.height = pipeHeight + "px";
+      pipeTop.style.height = pipeTopHeight + "px";
       pipeTop.style.left = "100vw";
-      pipeBottom.style.height = (window.innerHeight - pipeHeight - gapSize) + "px";
+
+      pipeBottom.style.height = (window.innerHeight - pipeBottomTop) + "px";
+      pipeBottom.style.top = pipeBottomTop + "px";
       pipeBottom.style.left = "100vw";
-      pipeBottom.style.top = (pipeHeight + gapSize) + "px";
 
       game.appendChild(pipeTop);
       game.appendChild(pipeBottom);
