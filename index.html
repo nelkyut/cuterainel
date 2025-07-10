@@ -33,8 +33,6 @@
       background-size: cover;
       background-position: center;
       overflow: hidden;
-      -webkit-user-select: none;
-      -ms-user-select: none;
       user-select: none;
     }
 
@@ -86,7 +84,6 @@
       left: 50%;
       transform: translateX(-50%);
       font-size: 28px;
-      font-weight: bold;
       background: var(--score-bg);
       padding: 10px 20px;
       border-radius: 25px;
@@ -112,9 +109,6 @@
       top: 20px;
       left: 20px;
       z-index: 30;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
     }
 
     #controls select {
@@ -132,21 +126,16 @@
       position: absolute;
       top: 40%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0);
+      transform: translate(-50%, -50%);
       background: rgba(255,192,203,0.95);
       color: #800080;
       padding: 30px 40px;
       font-size: 32px;
       border-radius: 30px;
       text-align: center;
+      display: none;
       z-index: 100;
       box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      animation: showGameOver 0.5s ease forwards;
-      display: none;
-    }
-
-    @keyframes showGameOver {
-      to { transform: translate(-50%, -50%) scale(1); }
     }
 
     #restart {
@@ -189,16 +178,11 @@
       <button id="restart">Restart</button>
     </div>
 
-    <!-- Background Music -->
-    <audio autoplay loop>
-      <source src="https://cdn.pixabay.com/download/audio/2023/04/03/audio_5b9884cd87.mp3?filename=asian-wet-market-ambience-143190.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- Sound Effects -->
-    <audio id="flap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7b96e3677.mp3?filename=wing-flap-6763.mp3"></audio>
-    <audio id="crash-sound" src="https://cdn.pixabay.com/download/audio/2023/03/29/audio_e429ea7b88.mp3?filename=impact-soft-142001.mp3"></audio>
-    <audio id="water-drop" src="https://cdn.pixabay.com/download/audio/2022/03/07/audio_d6c4c02fb0.mp3?filename=water-drop-144269.mp3"></audio>
-    <audio id="score-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b130b1d222.mp3?filename=success-1-6297.mp3"></audio>
+    <!-- Sounds -->
+    <audio id="flap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7b96e3677.mp3"></audio>
+    <audio id="crash-sound" src="https://cdn.pixabay.com/download/audio/2023/03/29/audio_e429ea7b88.mp3"></audio>
+    <audio id="water-drop" src="https://cdn.pixabay.com/download/audio/2022/03/07/audio_d6c4c02fb0.mp3"></audio>
+    <audio id="score-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b130b1d222.mp3"></audio>
   </div>
 
   <script>
@@ -223,6 +207,7 @@
 
     let pipeSpeed = 1.5;
     let gapSize = 280;
+    let pipeSpawnerId = null;
     let currentPipeColor = 'linear-gradient(to bottom, #e0aaff, #c77dff)';
 
     function changeTheme(theme) {
@@ -289,11 +274,9 @@
 
       pipeTop.style.height = gapY + "px";
       pipeTop.style.left = "100vw";
-
       pipeBottom.style.height = (window.innerHeight - gapY - gapSize) + "px";
       pipeBottom.style.top = (gapY + gapSize) + "px";
       pipeBottom.style.left = "100vw";
-
       pipeTop.style.background = pipeBottom.style.background = currentPipeColor;
 
       game.appendChild(pipeTop);
@@ -312,17 +295,13 @@
         const topRect = pipeTop.getBoundingClientRect();
         const bottomRect = pipeBottom.getBoundingClientRect();
 
-        const hitTop = (
-          rainelRect.left < topRect.right &&
-          rainelRect.right > topRect.left &&
-          rainelRect.top < topRect.bottom
-        );
+        const hitTop = rainelRect.left < topRect.right &&
+                       rainelRect.right > topRect.left &&
+                       rainelRect.top < topRect.bottom;
 
-        const hitBottom = (
-          rainelRect.left < bottomRect.right &&
-          rainelRect.right > bottomRect.left &&
-          rainelRect.bottom > bottomRect.top
-        );
+        const hitBottom = rainelRect.left < bottomRect.right &&
+                          rainelRect.right > bottomRect.left &&
+                          rainelRect.bottom > bottomRect.top;
 
         if (hitTop || hitBottom || rainelY > window.innerHeight - 60 || rainelY < 0) {
           endGame();
@@ -350,7 +329,6 @@
       crashSound.play();
       game.classList.add("flash");
       setTimeout(() => game.classList.remove("flash"), 400);
-
       if (score > highScore) {
         highScore = score;
         localStorage.setItem("rainelPrincessHigh", highScore.toString());
@@ -369,6 +347,7 @@
       scoreDisplay.textContent = "Score: 0";
       gameOver.style.display = "none";
       gameRunning = true;
+      clearTimeout(pipeSpawnerId); // 🛠 fix sa overlapping pipes
       loop();
       pipeSpawner();
     }
@@ -386,8 +365,21 @@
     function pipeSpawner() {
       if (!gameRunning) return;
       createPipe();
-      setTimeout(pipeSpawner, 1800);
+      pipeSpawnerId = setTimeout(pipeSpawner, 1800);
     }
+
+    // Unlock audio on first interaction
+    function unlockAudio() {
+      [flapSound, crashSound, waterDrop, scoreSound].forEach(audio => {
+        audio.play().catch(() => {});
+      });
+      document.removeEventListener("touchstart", unlockAudio);
+      document.removeEventListener("click", unlockAudio);
+      document.removeEventListener("keydown", unlockAudio);
+    }
+    document.addEventListener("touchstart", unlockAudio);
+    document.addEventListener("click", unlockAudio);
+    document.addEventListener("keydown", unlockAudio);
 
     changeTheme('light');
     loop();
