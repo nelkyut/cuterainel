@@ -156,27 +156,10 @@
       0% { background: rgba(255,255,255,0.8); }
       100% { background: transparent; }
     }
-
-    #start-screen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(255, 240, 250, 0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
-      color: #d63384;
-      font-family: 'Chewy', cursive;
-      z-index: 999;
-    }
   </style>
 </head>
 <body>
   <div class="game" id="game">
-    <div id="start-screen">Touch to Start</div>
     <div id="score">Score: 0</div>
     <div id="high-score">High Score: 0</div>
     <div id="controls">
@@ -195,6 +178,7 @@
       <button id="restart">Restart</button>
     </div>
 
+    <!-- Sounds -->
     <audio id="flap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7b96e3677.mp3"></audio>
     <audio id="crash-sound" src="https://cdn.pixabay.com/download/audio/2023/03/29/audio_e429ea7b88.mp3"></audio>
     <audio id="water-drop" src="https://cdn.pixabay.com/download/audio/2022/03/07/audio_d6c4c02fb0.mp3"></audio>
@@ -208,7 +192,6 @@
     const highScoreDisplay = document.getElementById("high-score");
     const gameOver = document.getElementById("game-over");
     const restartBtn = document.getElementById("restart");
-    const startScreen = document.getElementById("start-screen");
 
     const flapSound = document.getElementById("flap-sound");
     const crashSound = document.getElementById("crash-sound");
@@ -220,8 +203,7 @@
     const gravity = 0.6;
     const jump = -9;
     let score = 0;
-    let gameRunning = false;
-    let gameStarted = false;
+    let gameRunning = true;
 
     let pipeSpeed = 1.5;
     let gapSize = 280;
@@ -268,31 +250,10 @@
       waterDrop.play();
     }
 
-    function startGame() {
-      if (gameStarted) return;
-      gameStarted = true;
-      startScreen.style.display = "none";
-      gameRunning = true;
-      loop();
-      pipeSpawner();
-    }
-
     document.addEventListener("keydown", (e) => {
-      if (e.code === "Space") {
-        if (!gameStarted) startGame();
-        flap();
-      }
+      if (e.code === "Space") flap();
     });
-
-    document.addEventListener("touchstart", () => {
-      if (!gameStarted) startGame();
-      flap();
-    });
-
-    document.addEventListener("click", () => {
-      if (!gameStarted) startGame();
-      flap();
-    });
+    document.addEventListener("touchstart", flap);
 
     function updateDifficulty(score) {
       if (score % 10 === 0 && score !== 0) {
@@ -386,7 +347,7 @@
       scoreDisplay.textContent = "Score: 0";
       gameOver.style.display = "none";
       gameRunning = true;
-      gameStarted = true;
+      clearTimeout(pipeSpawnerId); // 🛠 fix sa overlapping pipes
       loop();
       pipeSpawner();
     }
@@ -407,6 +368,7 @@
       pipeSpawnerId = setTimeout(pipeSpawner, 2300);
     }
 
+    // Unlock audio on first interaction
     function unlockAudio() {
       [flapSound, crashSound, waterDrop, scoreSound].forEach(audio => {
         audio.play().catch(() => {});
@@ -415,12 +377,13 @@
       document.removeEventListener("click", unlockAudio);
       document.removeEventListener("keydown", unlockAudio);
     }
-
     document.addEventListener("touchstart", unlockAudio);
     document.addEventListener("click", unlockAudio);
     document.addEventListener("keydown", unlockAudio);
 
     changeTheme('light');
+    loop();
+    pipeSpawner();
   </script>
 </body>
 </html>
