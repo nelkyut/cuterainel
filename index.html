@@ -47,9 +47,15 @@
       left: 100px;
       top: 200px;
       border: 4px solid white;
-      box-shadow: 0 0 15px rgba(255,105,180,0.8);
+      box-shadow: 0 0 20px 5px rgba(255,105,180,0.8), 0 0 10px 5px orange;
       z-index: 10;
       background: white;
+      animation: float 2s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(-2px); }
+      50% { transform: translateY(2px); }
     }
 
     .rainel img {
@@ -63,6 +69,12 @@
       width: 80px;
       border: 3px solid white;
       border-radius: 20px;
+      opacity: 0;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
     }
 
     .pipe { bottom: 0; }
@@ -120,16 +132,21 @@
       position: absolute;
       top: 40%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(0);
       background: rgba(255,192,203,0.95);
       color: #800080;
       padding: 30px 40px;
       font-size: 32px;
       border-radius: 30px;
       text-align: center;
-      display: none;
       z-index: 100;
       box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      animation: showGameOver 0.5s ease forwards;
+      display: none;
+    }
+
+    @keyframes showGameOver {
+      to { transform: translate(-50%, -50%) scale(1); }
     }
 
     #restart {
@@ -199,7 +216,7 @@
 
     let pipeSpeed = 1.5;
     let gapSize = 280;
-    let currentPipeColor = 'linear-gradient(to bottom, #e0aaff, #c77dff)'; // default
+    let currentPipeColor = 'linear-gradient(to bottom, #e0aaff, #c77dff)';
 
     function changeTheme(theme) {
       const root = document.documentElement;
@@ -328,6 +345,7 @@
         localStorage.setItem("rainelPrincessHigh", highScore.toString());
       }
       highScoreDisplay.textContent = "High Score: " + highScore;
+
       gameOver.style.display = "block";
     }
 
