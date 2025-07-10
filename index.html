@@ -61,7 +61,6 @@
     .pipe, .pipe-top {
       position: absolute;
       width: 80px;
-      background: linear-gradient(to bottom, #e0aaff, #c77dff);
       border: 3px solid white;
       border-radius: 20px;
     }
@@ -162,6 +161,7 @@
         <option value="light">🌸 Light Pink</option>
         <option value="purple">💜 Pastel Purple</option>
         <option value="dark">🌙 Night Mode</option>
+        <option value="sky">☁️ Sky Blue</option>
       </select>
       <button onclick="setMode('easy')">Easy</button>
       <button onclick="setMode('hard')">Hard</button>
@@ -201,6 +201,7 @@
 
     let pipeSpeed = 1.5;
     let gapSize = 280;
+    let currentPipeColor = 'linear-gradient(to bottom, #e0aaff, #c77dff)'; // default
 
     function setMode(mode) {
       if (mode === 'easy') {
@@ -219,16 +220,25 @@
         root.style.setProperty('--text-color', '#6a0dad');
         root.style.setProperty('--score-bg', 'rgba(255, 255, 255, 0.9)');
         document.body.style.backgroundColor = '#fce4ec';
+        currentPipeColor = 'linear-gradient(to bottom, #e0aaff, #c77dff)';
       } else if (theme === 'purple') {
         root.style.setProperty('--bg-color', 'rgba(230, 220, 255, 0.9)');
         root.style.setProperty('--text-color', '#4b0082');
         root.style.setProperty('--score-bg', 'rgba(240, 230, 255, 0.9)');
         document.body.style.backgroundColor = '#e6ccff';
+        currentPipeColor = 'linear-gradient(to bottom, #c19fff, #aa6fff)';
       } else if (theme === 'dark') {
         root.style.setProperty('--bg-color', 'rgba(20, 20, 30, 0.9)');
         root.style.setProperty('--text-color', '#ffffff');
         root.style.setProperty('--score-bg', 'rgba(40, 40, 60, 0.9)');
         document.body.style.backgroundColor = '#121212';
+        currentPipeColor = 'linear-gradient(to bottom, #555, #222)';
+      } else if (theme === 'sky') {
+        root.style.setProperty('--bg-color', 'rgba(200, 240, 255, 0.9)');
+        root.style.setProperty('--text-color', '#0077b6');
+        root.style.setProperty('--score-bg', 'rgba(220, 250, 255, 0.9)');
+        document.body.style.backgroundColor = '#a8dadc';
+        currentPipeColor = 'linear-gradient(to bottom, #90e0ef, #00b4d8)';
       }
     }
 
@@ -262,6 +272,8 @@
       pipeBottom.style.height = (window.innerHeight - gapY - gapSize) + "px";
       pipeBottom.style.top = (gapY + gapSize) + "px";
       pipeBottom.style.left = "100vw";
+
+      pipeTop.style.background = pipeBottom.style.background = currentPipeColor;
 
       game.appendChild(pipeTop);
       game.appendChild(pipeBottom);
