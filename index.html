@@ -2,11 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Rainel Flappy Princess (Easy)</title>
-
-  <!-- Disable zooming on mobile -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
+  <title>Rainel Flappy Princess</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <style>
     * {
       box-sizing: border-box;
@@ -16,8 +13,10 @@
     body {
       margin: 0;
       overflow: hidden;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: 'Baloo 2', cursive;
     }
+
+    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&display=swap');
 
     .game {
       position: relative;
@@ -60,25 +59,23 @@
       border-radius: 20px;
     }
 
-    .pipe {
-      bottom: 0;
-    }
-
-    .pipe-top {
-      top: 0;
-    }
+    .pipe { bottom: 0; }
+    .pipe-top { top: 0; }
 
     #score {
       position: absolute;
       top: 20px;
-      left: 20px;
-      font-size: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 28px;
       font-weight: bold;
-      background: rgba(255,255,255,0.8);
-      padding: 8px 16px;
-      border-radius: 20px;
+      background: rgba(255,255,255,0.9);
+      padding: 10px 20px;
+      border-radius: 25px;
       z-index: 20;
-      color: #d63384;
+      color: #6a0dad;
+      font-family: 'Baloo 2', cursive;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
 
     #high-score {
@@ -86,10 +83,28 @@
       top: 60px;
       left: 20px;
       font-size: 20px;
-      background: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.7);
       padding: 6px 14px;
       border-radius: 20px;
       z-index: 20;
+      color: #d63384;
+    }
+
+    #mode-buttons {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 30;
+    }
+
+    #mode-buttons button {
+      background: white;
+      border: 2px solid #d63384;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 5px;
       color: #d63384;
     }
 
@@ -133,6 +148,10 @@
   <div class="game" id="game">
     <div id="score">Score: 0</div>
     <div id="high-score">High Score: 0</div>
+    <div id="mode-buttons">
+      <button onclick="setMode('easy')">Easy</button>
+      <button onclick="setMode('hard')">Hard</button>
+    </div>
     <div class="rainel" id="rainel">
       <img src="rainel.png" alt="Rainel Princess">
     </div>
@@ -141,15 +160,10 @@
       <button id="restart">Restart</button>
     </div>
 
-    <!-- Background Sound -->
     <audio autoplay loop>
       <source src="https://cdn.pixabay.com/download/audio/2023/04/03/audio_5b9884cd87.mp3?filename=asian-wet-market-ambience-143190.mp3" type="audio/mpeg">
     </audio>
-
-    <!-- Flap Sound -->
     <audio id="flap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7b96e3677.mp3?filename=wing-flap-6763.mp3"></audio>
-
-    <!-- Crash Sound -->
     <audio id="crash-sound" src="https://cdn.pixabay.com/download/audio/2023/03/29/audio_e429ea7b88.mp3?filename=impact-soft-142001.mp3"></audio>
   </div>
 
@@ -174,6 +188,16 @@
     let pipeSpeed = 1.5;
     let gapSize = 280;
 
+    function setMode(mode) {
+      if (mode === 'easy') {
+        pipeSpeed = 1.5;
+        gapSize = 280;
+      } else if (mode === 'hard') {
+        pipeSpeed = 3;
+        gapSize = 180;
+      }
+    }
+
     let highScore = parseInt(localStorage.getItem("rainelPrincessHigh") || "0");
     highScoreDisplay.textContent = "High Score: " + highScore;
 
@@ -186,72 +210,70 @@
     document.addEventListener("keydown", (e) => {
       if (e.code === "Space") flap();
     });
-
     document.addEventListener("touchstart", flap);
 
     function createPipe() {
-  const minGapY = 100;
-  const maxGapY = window.innerHeight - gapSize - 100;
-  const gapY = Math.floor(Math.random() * (maxGapY - minGapY)) + minGapY;
+      const minGapY = 100;
+      const maxGapY = window.innerHeight - gapSize - 100;
+      const gapY = Math.floor(Math.random() * (maxGapY - minGapY)) + minGapY;
 
-  const pipeTop = document.createElement("div");
-  const pipeBottom = document.createElement("div");
+      const pipeTop = document.createElement("div");
+      const pipeBottom = document.createElement("div");
+      pipeTop.classList.add("pipe-top");
+      pipeBottom.classList.add("pipe");
 
-  pipeTop.classList.add("pipe-top");
-  pipeBottom.classList.add("pipe");
+      pipeTop.style.height = gapY + "px";
+      pipeTop.style.left = "100vw";
 
-  pipeTop.style.height = gapY + "px";
-  pipeTop.style.left = "100vw";
+      pipeBottom.style.height = (window.innerHeight - gapY - gapSize) + "px";
+      pipeBottom.style.top = (gapY + gapSize) + "px";
+      pipeBottom.style.left = "100vw";
 
-  pipeBottom.style.height = (window.innerHeight - gapY - gapSize) + "px";
-  pipeBottom.style.top = (gapY + gapSize) + "px";
-  pipeBottom.style.left = "100vw";
+      game.appendChild(pipeTop);
+      game.appendChild(pipeBottom);
 
-  game.appendChild(pipeTop);
-  game.appendChild(pipeBottom);
+      let pipeX = window.innerWidth;
+      let scored = false;
 
-  let pipeX = window.innerWidth;
-  let scored = false;
+      const move = setInterval(() => {
+        if (!gameRunning) return clearInterval(move);
+        pipeX -= pipeSpeed;
+        pipeTop.style.left = pipeX + "px";
+        pipeBottom.style.left = pipeX + "px";
 
-  const move = setInterval(() => {
-    if (!gameRunning) return clearInterval(move);
-    pipeX -= pipeSpeed;
-    pipeTop.style.left = pipeX + "px";
-    pipeBottom.style.left = pipeX + "px";
+        const rainelRect = rainel.getBoundingClientRect();
+        const topRect = pipeTop.getBoundingClientRect();
+        const bottomRect = pipeBottom.getBoundingClientRect();
 
-    const rainelRect = rainel.getBoundingClientRect();
-    const topRect = pipeTop.getBoundingClientRect();
-    const bottomRect = pipeBottom.getBoundingClientRect();
+        const hitTop = (
+          rainelRect.left < topRect.right &&
+          rainelRect.right > topRect.left &&
+          rainelRect.top < topRect.bottom
+        );
 
-    const hitTop = (
-      rainelRect.left < topRect.right &&
-      rainelRect.right > topRect.left &&
-      rainelRect.top < topRect.bottom
-    );
+        const hitBottom = (
+          rainelRect.left < bottomRect.right &&
+          rainelRect.right > bottomRect.left &&
+          rainelRect.bottom > bottomRect.top
+        );
 
-    const hitBottom = (
-      rainelRect.left < bottomRect.right &&
-      rainelRect.right > bottomRect.left &&
-      rainelRect.bottom > bottomRect.top
-    );
+        if (hitTop || hitBottom || rainelY > window.innerHeight - 60 || rainelY < 0) {
+          endGame();
+          clearInterval(move);
+        }
 
-    if (hitTop || hitBottom || rainelY > window.innerHeight - 60 || rainelY < 0) {
-      endGame();
-      clearInterval(move);
+        if (!scored && pipeX + 80 < 100) {
+          scored = true;
+          score++;
+          scoreDisplay.textContent = "Score: " + score;
+        }
+
+        if (pipeX < -100) {
+          pipeTop.remove();
+          pipeBottom.remove();
+        }
+      }, 16);
     }
-
-    if (!scored && pipeX + 80 < 100) {
-      scored = true;
-      score++;
-      scoreDisplay.textContent = "Score: " + score;
-    }
-
-    if (pipeX < -100) {
-      pipeTop.remove();
-      pipeBottom.remove();
-    }
-  }, 16);
-}
 
     function endGame() {
       gameRunning = false;
@@ -295,6 +317,7 @@
       setTimeout(pipeSpawner, 1800);
     }
 
+    setMode('easy'); // Default mode
     loop();
     pipeSpawner();
   </script>
