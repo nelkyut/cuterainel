@@ -190,68 +190,68 @@
     document.addEventListener("touchstart", flap);
 
     function createPipe() {
-      const centerY = window.innerHeight / 2;
-      const pipeTopHeight = centerY - gapSize / 2;
-      const pipeBottomTop = centerY + gapSize / 2;
+  const minGapY = 100;
+  const maxGapY = window.innerHeight - gapSize - 100;
+  const gapY = Math.floor(Math.random() * (maxGapY - minGapY)) + minGapY;
 
-      const pipeTop = document.createElement("div");
-      const pipeBottom = document.createElement("div");
+  const pipeTop = document.createElement("div");
+  const pipeBottom = document.createElement("div");
 
-      pipeTop.classList.add("pipe-top");
-      pipeBottom.classList.add("pipe");
+  pipeTop.classList.add("pipe-top");
+  pipeBottom.classList.add("pipe");
 
-      pipeTop.style.height = pipeTopHeight + "px";
-      pipeTop.style.left = "100vw";
+  pipeTop.style.height = gapY + "px";
+  pipeTop.style.left = "100vw";
 
-      pipeBottom.style.height = (window.innerHeight - pipeBottomTop) + "px";
-      pipeBottom.style.top = pipeBottomTop + "px";
-      pipeBottom.style.left = "100vw";
+  pipeBottom.style.height = (window.innerHeight - gapY - gapSize) + "px";
+  pipeBottom.style.top = (gapY + gapSize) + "px";
+  pipeBottom.style.left = "100vw";
 
-      game.appendChild(pipeTop);
-      game.appendChild(pipeBottom);
+  game.appendChild(pipeTop);
+  game.appendChild(pipeBottom);
 
-      let pipeX = window.innerWidth;
-      let scored = false;
+  let pipeX = window.innerWidth;
+  let scored = false;
 
-      const move = setInterval(() => {
-        if (!gameRunning) return clearInterval(move);
-        pipeX -= pipeSpeed;
-        pipeTop.style.left = pipeX + "px";
-        pipeBottom.style.left = pipeX + "px";
+  const move = setInterval(() => {
+    if (!gameRunning) return clearInterval(move);
+    pipeX -= pipeSpeed;
+    pipeTop.style.left = pipeX + "px";
+    pipeBottom.style.left = pipeX + "px";
 
-        const rainelRect = rainel.getBoundingClientRect();
-        const topRect = pipeTop.getBoundingClientRect();
-        const bottomRect = pipeBottom.getBoundingClientRect();
+    const rainelRect = rainel.getBoundingClientRect();
+    const topRect = pipeTop.getBoundingClientRect();
+    const bottomRect = pipeBottom.getBoundingClientRect();
 
-        const hitTop = (
-          rainelRect.left < topRect.right &&
-          rainelRect.right > topRect.left &&
-          rainelRect.top < topRect.bottom
-        );
+    const hitTop = (
+      rainelRect.left < topRect.right &&
+      rainelRect.right > topRect.left &&
+      rainelRect.top < topRect.bottom
+    );
 
-        const hitBottom = (
-          rainelRect.left < bottomRect.right &&
-          rainelRect.right > bottomRect.left &&
-          rainelRect.bottom > bottomRect.top
-        );
+    const hitBottom = (
+      rainelRect.left < bottomRect.right &&
+      rainelRect.right > bottomRect.left &&
+      rainelRect.bottom > bottomRect.top
+    );
 
-        if (hitTop || hitBottom || rainelY > window.innerHeight - 60 || rainelY < 0) {
-          endGame();
-          clearInterval(move);
-        }
-
-        if (!scored && pipeX + 80 < 100) {
-          scored = true;
-          score++;
-          scoreDisplay.textContent = "Score: " + score;
-        }
-
-        if (pipeX < -100) {
-          pipeTop.remove();
-          pipeBottom.remove();
-        }
-      }, 16);
+    if (hitTop || hitBottom || rainelY > window.innerHeight - 60 || rainelY < 0) {
+      endGame();
+      clearInterval(move);
     }
+
+    if (!scored && pipeX + 80 < 100) {
+      scored = true;
+      score++;
+      scoreDisplay.textContent = "Score: " + score;
+    }
+
+    if (pipeX < -100) {
+      pipeTop.remove();
+      pipeBottom.remove();
+    }
+  }, 16);
+}
 
     function endGame() {
       gameRunning = false;
